@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import Users from "./Users";
 import UsersList from "./UsersList";
+import RollbackTest from "./RollbackTest";
 
 
 function Home() {
@@ -20,13 +21,15 @@ export default function App() {
     <>
       <nav style={{ padding: 16, borderBottom: "1px solid #eee" }}>
         <Link to="/" style={{ marginRight: 12 }}>Home</Link>
-        <Link to="/users">Users</Link>
+        <Link to="/users" style={{ marginRight: 12 }}>Users</Link>
+        <Link to="/rollback-test">Rollback Test</Link>
       </nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/users" element={<UsersList />} />
         <Route path="/users-add" element={<Users />} />
+        <Route path="/rollback-test" element={<RollbackTest />} />
       </Routes>
     </>
   );
