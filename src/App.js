@@ -1,25 +1,71 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import api from "./api";
 
-function App() {
+export default function App() {
+  const [users, setUsers] = useState([]);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [editId, setEditId] = useState(null);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    const res = await api.get("/users");
+    setUsers(res.data);
+  };
+
+  const saveUser = async () => {
+    if (editId) {
+      await api.put(`/users/${editId}`, { name, email });
+    } else {
+      await api.post("/users", { name, email });
+    }
+    setName("");
+    setEmail("");
+    setEditId(null);
+    fetchUsers();
+  };
+
+  const editUser = (user) => {
+    setName(user.name);
+    setEmail(user.email);
+    setEditId(user.id);
+  };
+
+  const deleteUser = async (id) => {
+    await api.delete(`/users/${id}`);
+    fetchUsers();
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ padding: 40 }}>
+      <h2>User CRUD</h2>
+
+      <input
+        placeholder="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <input
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <button onClick={saveUser}>
+        {editId ? "Update" : "Create"}
+      </button>
+
+      <ul>
+        {users.map((u) => (
+          <li key={u.id}>
+            {u.name} ({u.email})
+            <button onClick={() => editUser(u)}>Edit</button>
+            <button onClick={() => deleteUser(u.id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
-
-export default App;
