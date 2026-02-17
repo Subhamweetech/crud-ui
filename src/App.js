@@ -1,71 +1,33 @@
-import React, { useEffect, useState } from "react";
-import api from "./api";
+import React from "react";
+import { Routes, Route, Link } from "react-router-dom";
+import Users from "./Users";
+import UsersList from "./UsersList";
 
-export default function App() {
-  const [users, setUsers] = useState([]);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [editId, setEditId] = useState(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    const res = await api.get("/users");
-    setUsers(res.data);
-  };
-
-  const saveUser = async () => {
-    if (editId) {
-      await api.put(`/users/${editId}`, { name, email });
-    } else {
-      await api.post("/users", { name, email });
-    }
-    setName("");
-    setEmail("");
-    setEditId(null);
-    fetchUsers();
-  };
-
-  const editUser = (user) => {
-    setName(user.name);
-    setEmail(user.email);
-    setEditId(user.id);
-  };
-
-  const deleteUser = async (id) => {
-    await api.delete(`/users/${id}`);
-    fetchUsers();
-  };
-
+function Home() {
   return (
     <div style={{ padding: 40 }}>
-      <h2>User CRUD</h2>
-
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <button onClick={saveUser}>
-        {editId ? "Update" : "Create"}
-      </button>
-
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>
-            {u.name} ({u.email})
-            <button onClick={() => editUser(u)}>Edit</button>
-            <button onClick={() => deleteUser(u.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <h1>Dashboard</h1>
+      <p>
+        Go to <Link to="/users-add">Users CRUD</Link>
+      </p>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <>
+      <nav style={{ padding: 16, borderBottom: "1px solid #eee" }}>
+        <Link to="/" style={{ marginRight: 12 }}>Home</Link>
+        <Link to="/users">Users</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/users" element={<UsersList />} />
+        <Route path="/users-add" element={<Users />} />
+      </Routes>
+    </>
   );
 }
