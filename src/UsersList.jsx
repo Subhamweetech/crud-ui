@@ -13,19 +13,25 @@ export default function UsersList() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p>Loading users...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <div className="container">Loading users...</div>;
+  if (error) return <div className="container" style={{ color: "red" }}>{error}</div>;
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Users</h2>
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>
-            {u.name} — {u.email}
-          </li>
-        ))}
-      </ul>
+    <div className="container">
+      <h2>All Users</h2>
+
+      {users.length === 0 ? (
+        <p>No users found.</p>
+      ) : (
+        users.map((u) => (
+          <div className="user-row" key={u.id}>
+            <div>
+              <strong>{u.name}</strong>
+              <div style={{ fontSize: 13, color: "#6b7280" }}>{u.email}</div>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

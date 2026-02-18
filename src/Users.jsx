@@ -17,21 +17,18 @@ export default function Users() {
   };
 
   const saveUser = async () => {
+    if (!name || !email) return alert("Name & Email required");
+
     if (editId) {
       await api.put(`/users/${editId}`, { name, email });
     } else {
       await api.post("/users", { name, email });
     }
+
     setName("");
     setEmail("");
     setEditId(null);
     fetchUsers();
-  };
-
-  const editUser = (user) => {
-    setName(user.name);
-    setEmail(user.email);
-    setEditId(user.id);
   };
 
   const deleteUser = async (id) => {
@@ -40,32 +37,56 @@ export default function Users() {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h2>User CRUD</h2>
+    <div className="container">
+      <h2>User Management</h2>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <button onClick={saveUser}>
-        {editId ? "Update" : "Create"}
-      </button>
+      <div className="form-row">
+        <input
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          placeholder="Email Address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <button onClick={saveUser}>
+          {editId ? "Update User" : "Create User"}
+        </button>
+      </div>
 
-      <ul>
-        {users.map((u) => (
-          <li key={u.id}>
-            {u.name} ({u.email})
-            <button onClick={() => editUser(u)}>Edit</button>
-            <button onClick={() => deleteUser(u.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      {users.length === 0 ? (
+        <p>No users yet.</p>
+      ) : (
+        users.map((u) => (
+          <div className="user-row" key={u.id}>
+            <div>
+              <strong>{u.name}</strong>
+              <div style={{ fontSize: 13, color: "#6b7280" }}>{u.email}</div>
+            </div>
+
+            <div className="actions">
+              <button
+                className="secondary"
+                onClick={() => {
+                  setName(u.name);
+                  setEmail(u.email);
+                  setEditId(u.id);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="danger"
+                onClick={() => deleteUser(u.id)}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        ))
+      )}
     </div>
   );
 }

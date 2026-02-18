@@ -7,11 +7,19 @@ import RollbackTest from "./RollbackTest";
 
 function Home() {
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Dashboard</h1>
-      <p>
-        Go to <Link to="/users-add">Users CRUD</Link>
-      </p>
+    <div className="container">
+      <h1>Admin Dashboard</h1>
+      <p>Manage users, test rollback logic and monitor system health.</p>
+
+      <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+        <Link to="/users-add">
+          <button>Manage Users</button>
+        </Link>
+
+        <Link to="/users">
+          <button className="secondary">View Users</button>
+        </Link>
+      </div>
     </div>
   );
 }
@@ -19,9 +27,10 @@ function Home() {
 export default function App() {
   return (
     <>
-      <nav style={{ padding: 16, borderBottom: "1px solid #eee" }}>
-        <Link to="/" style={{ marginRight: 12 }}>Home</Link>
-        <Link to="/users" style={{ marginRight: 12 }}>Users</Link>
+      <nav className="navbar">
+        <Link to="/">Dashboard</Link>
+        <Link to="/users">Users</Link>
+        <Link to="/users-add">Manage Users</Link>
         <Link to="/rollback-test">Rollback Test</Link>
       </nav>
 
