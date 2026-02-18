@@ -1,4 +1,4 @@
-name: Deploy Frontend to S3 + CloudFront (Safe + Rollback)
+name: Deploy Frontend to S3 + CloudFront
 
 on:
   push:
@@ -10,53 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "npm"
 
-      # Install deps (fallback to npm install if lockfile mismatch)
-      - name: Install deps
-        run: |
-          npm ci || npm install
+      - name: Install dependencies
+        run: npm ci
 
-      # Build with backend API URL (CloudFront in front of ALB)
-      - name: Build
+      - name: Build React (use ALB backend URL)
         run: |
           REACT_APP_API_URL=https://d1pmwx4mixztbi.cloudfront.net/api npm run build
 
-      # Configure AWS
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          SOURCE_DIR: build
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Verify AWS auth
-        run: aws sts get-caller-identity
-
-      # Upload to versioned release folder
-      - name: Upload versioned release
-        run: |
-          aws s3 sync build s3://demo-frontend-canary/releases/${{ github.sha }}/ --delete
-
-      # Smoke test (ensures build is complete in S3)
-      - name: Smoke test index.html exists
-        run: |
-          aws s3 ls s3://demo-frontend-canary/releases/${{ github.sha }}/index.html
-
-      # Promote to production (only runs if above steps succeed)
-      - name: Promote to production
-        run: |
-          aws s3 sync s3://demo-frontend-canary/releases/${{ github.sha }}/ s3://demo-frontend-canary/current/ --delete
-
-      # Invalidate CloudFront cache
-      - name: Invalidate CloudFront
+      - name: Invalidate CloudFront cache
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
