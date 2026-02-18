@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import Users from "./Users";
 import UsersList from "./UsersList";
 import RollbackTest from "./RollbackTest";
+import api from "./api";
 
 
 function Home() {
+  const [data, setData] = React.useState(null);
+
+  useEffect(() => {
+      fetchDetails();
+    }, []);
+
+  const fetchDetails = async () => {
+    const res = await api.get("/demo");    
+    setData(res.data.message);
+  };
+
   return (
     <div className="container">
       <h1>Admin Dashboard</h1>
+      <p>{data}</p>
       <p>Manage users, test rollback logic and monitor system health.</p>
 
       <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
