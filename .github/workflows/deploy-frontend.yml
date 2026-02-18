@@ -10,14 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - run: npm ci
-      - run: npm run build
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React (use ALB backend URL)
+        run: |
+          REACT_APP_API_URL=https://alb-backend-prod-1925060839.eu-north-1.elb.amazonaws.com/api npm run build
 
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
