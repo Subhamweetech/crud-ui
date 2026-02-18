@@ -23,7 +23,7 @@ jobs:
 
       - name: Build React (use ALB backend URL)
         run: |
-          REACT_APP_API_URL=https://alb-backend-prod-1925060839.eu-north-1.elb.amazonaws.com/api npm run build
+          REACT_APP_API_URL=http://alb-backend-prod-1925060839.eu-north-1.elb.amazonaws.com/api npm run build
 
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
